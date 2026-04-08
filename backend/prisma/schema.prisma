@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  password    String
+  role        String       @default("USER") // ADMIN or USER
+  attendances Attendance[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Student {
+  id           Int          @id @default(autoincrement())
+  qrCode       String       @unique
+  firstName    String
+  lastName     String
+  photoUrl     String?
+  gradeSection String
+  details      String?
+  numApoderado String?      // WhatsApp number for notifications
+  attendances  Attendance[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Attendance {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  registrarId Int?
+  dateTime    DateTime @default(now())
+  status      String   // PRESENTE, TARDE, FALTO
+
+  student     Student  @relation(fields: [studentId], references: [id])
+  registrar   User?    @relation(fields: [registrarId], references: [id])
+}
