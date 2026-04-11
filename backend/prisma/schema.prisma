@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -35,10 +34,17 @@ model Student {
 model Attendance {
   id          Int      @id @default(autoincrement())
   studentId   Int
-  registrarId Int?
+  usuarioId   Int
   dateTime    DateTime @default(now())
-  status      String   // PRESENTE, TARDE, FALTO
+  status      String   // PRESENTE, TEMPRANO, TARDE, FALTO
 
   student     Student  @relation(fields: [studentId], references: [id])
-  registrar   User?    @relation(fields: [registrarId], references: [id])
+  usuario     User     @relation(fields: [usuarioId], references: [id])
+}
+
+model Setting {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  updatedAt   DateTime @updatedAt
 }

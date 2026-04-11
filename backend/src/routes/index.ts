@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import authRoutes from './auth.routes';
+import configRoutes from './config.routes';
+import attendanceRoutes from './attendance.routes';
+import metricsRoutes from './metrics.routes';
+
+const router = Router();
+
+router.use('/auth', authRoutes);
+router.use('/config', configRoutes);
+router.use('/attendance', attendanceRoutes);
+router.use('/metrics', metricsRoutes);
+
+export default router;
