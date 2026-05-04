@@ -18,8 +18,9 @@ export class AuthController {
         return;
       }
 
-      // Guardar id_usuario en la sesión
+      // Guardar id_usuario y rol en la sesión
       req.session.usuarioId = user.id;
+      req.session.role = user.role;
 
       res.status(200).json({
         message: 'Login exitoso',

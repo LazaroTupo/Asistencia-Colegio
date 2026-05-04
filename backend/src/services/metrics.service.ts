@@ -2,7 +2,7 @@ import prisma from '../config/prisma';
 
 export class MetricsService {
   // Retorna la lista detallada por día
-  static async getHistoryByDate(dateString: string) { // formato YYYY-MM-DD
+  static async getHistoryByDate(dateString: string, limit?: number) { // formato YYYY-MM-DD
     const dateStart = new Date(`${dateString}T00:00:00.000Z`);
     const dateEnd = new Date(`${dateString}T23:59:59.999Z`);
 
@@ -15,24 +15,14 @@ export class MetricsService {
       },
       include: {
         student: {
-          select: { firstName: true, lastName: true, numApoderado: true }
-        },
-        usuario: {
-          select: { name: true }
+          select: { firstName: true, lastName: true, gradeSection: true }
         }
       },
-      orderBy: { dateTime: 'desc' }
+      orderBy: { dateTime: 'desc' },
+      take: limit
     });
 
-    return records.map(r => ({
-      id: r.id,
-      nombre: r.student.firstName,
-      apellido: r.student.lastName,
-      horaEntrada: r.dateTime,
-      estado: r.status,
-      usuarioEscaneador: r.usuario.name,
-      numApoderado: r.student.numApoderado
-    }));
+    return records;
   }
 
   // Retorna el total numérico de cada estado
@@ -40,40 +30,46 @@ export class MetricsService {
     const dateStart = new Date(`${dateString}T00:00:00.000Z`);
     const dateEnd = new Date(`${dateString}T23:59:59.999Z`);
 
-    const groups = await prisma.attendance.groupBy({
-      by: ['status'],
-      where: {
-        dateTime: {
-          gte: dateStart,
-          lte: dateEnd
-        }
-      },
-      _count: {
-        _all: true
-      }
-    });
+    const [groups, totalStudents] = await Promise.all([
+      prisma.attendance.groupBy({
+        by: ['status'],
+        where: {
+          dateTime: {
+            gte: dateStart,
+            lte: dateEnd
+          }
+        },
+        _count: { _all: true }
+      }),
+      prisma.student.count()
+    ]);
 
-    // En Prisma, podemos sacar totales si usamos aggregate, o simplemente sumando. 
-    // Para simplificar mapearemos los count resultantes.
-    const totals = {
-      totalAsistidos: 0, // TEMPRANO + PRESENTE + TARDE
+    const summary = {
+      total: totalStudents,
+      presentes: 0,
       temprano: 0,
       tarde: 0,
-      falto: 0,
+      faltas: 0,
     };
 
+    let totalAsistidos = 0;
     for (const group of groups) {
+      const count = group._count._all;
       if (group.status === 'TEMPRANO' || group.status === 'PRESENTE') {
-        totals.temprano += group._count._all;
-        totals.totalAsistidos += group._count._all;
+        summary.temprano += count;
+        totalAsistidos += count;
       } else if (group.status === 'TARDE') {
-        totals.tarde += group._count._all;
-        totals.totalAsistidos += group._count._all;
+        summary.tarde += count;
+        totalAsistidos += count;
       } else if (group.status === 'FALTO') {
-        totals.falto += group._count._all;
+        summary.faltas += count;
       }
     }
+    
+    summary.presentes = totalAsistidos;
+    // Las faltas también se pueden calcular como Total - Presentes
+    summary.faltas = Math.max(0, totalStudents - totalAsistidos);
 
-    return totals;
+    return summary;
   }
 }
