@@ -18,6 +18,12 @@ export class ConfigService {
     return settings;
   }
 
+  // Obtener el límite de tardanza en formato "HH:MM"
+  static async getTardinessLimit(): Promise<string> {
+    const settings = await this.getSettings();
+    return settings['limit_tardanza'] ?? '08:00';
+  }
+
   // Guardar múltiples configuraciones
   static async updateSettings(newSettings: Record<string, string>) {
     const promises = Object.entries(newSettings).map(([key, value]) => {
