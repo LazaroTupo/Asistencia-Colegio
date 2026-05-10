@@ -3,6 +3,7 @@ import authRoutes from './auth.routes';
 import configRoutes from './config.routes';
 import attendanceRoutes from './attendance.routes';
 import metricsRoutes from './metrics.routes';
+import whatsappRoutes from './whatsapp.routes';
 
 const router = Router();
 
@@ -10,5 +11,6 @@ router.use('/auth', authRoutes);
 router.use('/config', configRoutes);
 router.use('/attendance', attendanceRoutes);
 router.use('/metrics', metricsRoutes);
+router.use('/whatsapp', whatsappRoutes);
 
 export default router;

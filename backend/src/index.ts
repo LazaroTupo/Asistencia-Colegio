@@ -2,15 +2,29 @@ import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import dotenv from 'dotenv';
-import './types/express-session.d';
 
 dotenv.config();
 
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Puerto por defecto de Vite
-  credentials: true // Importante para usar express-session con CORS
+  origin: (origin, callback) => {
+    // Permitir si no hay origin (como herramientas de test)
+    if (!origin) return callback(null, true);
+    
+    // Lista de permitidos o patrones
+    const allowed = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ];
+    
+    if (allowed.includes(origin) || origin.endsWith('.loca.lt') || origin.endsWith('.devtunnels.ms')) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
+  credentials: true
 }));
 
 app.use(express.json());
