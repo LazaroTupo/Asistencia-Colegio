@@ -38,8 +38,4 @@ export class ConfigService {
     return this.getSettings();
   }
 
-  static async getTardinessLimit(): Promise<string> {
-    const settings = await this.getSettings();
-    return settings['limit_tardanza'] || '08:00';
-  }
 }
