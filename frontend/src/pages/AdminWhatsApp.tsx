@@ -51,8 +51,9 @@ export const AdminWhatsApp = () => {
   // Si el modal de QR esta abierto y el polling dice que ya se conectó, lo cerramos
   useEffect(() => {
     if (qrModal) {
-      const currentInst = instances.find(i => i.instance.instanceName === qrModal.name);
-      if (currentInst && currentInst.instance.status === 'open') {
+      const currentInst = instances.find(i => (i.instance?.instanceName || i.name) === qrModal.name);
+      const status = currentInst ? (currentInst.instance?.status || currentInst.connectionStatus) : null;
+      if (currentInst && status === 'open') {
         setQrModal(null);
         alert('¡Instancia conectada exitosamente!');
       }
@@ -143,8 +144,8 @@ export const AdminWhatsApp = () => {
           <p className="empty-state">No hay instancias creadas.</p>
         ) : (
           instances.map((inst) => {
-            const name = inst.instance.instanceName;
-            const status = inst.instance.status; // 'open', 'connecting', 'close'
+            const name = inst.instance?.instanceName || inst.name;
+            const status = inst.instance?.status || inst.connectionStatus; // 'open', 'connecting', 'close'
             const isActive = name === activeInstanceName;
 
             return (

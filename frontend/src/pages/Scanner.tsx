@@ -11,10 +11,15 @@ interface ScanResult {
 
 export const Scanner = () => {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
+    const qrReader = document.getElementById("qr-reader");
+    if (qrReader && qrReader.innerHTML !== "") {
+      return; // Ya está inicializado
+    }
+
     // Configuración del escaner
     scannerRef.current = new Html5QrcodeScanner(
       "qr-reader",
@@ -32,9 +37,9 @@ export const Scanner = () => {
   }, []);
 
   const onScanSuccess = async (decodedText: string, _decodedResult: any) => {
-    if (isProcessing) return;
+    if (isProcessingRef.current) return;
     
-    setIsProcessing(true);
+    isProcessingRef.current = true;
     
     try {
       const response = await api.post('/attendance/scan', { qrCode: decodedText });
@@ -46,15 +51,16 @@ export const Scanner = () => {
         studentName: `${record.student.firstName} ${record.student.lastName}`
       });
     } catch (error: any) {
+      console.error('Error en escaneo:', error);
       setScanResult({
         success: false,
-        message: error.response?.data?.error || 'Error al procesar QR'
+        message: error.response?.data?.error || error.message || 'Error al procesar QR'
       });
     } finally {
       // Ocultar mensaje después de 2.5 segundos y permitir nuevo escaneo
       setTimeout(() => {
         setScanResult(null);
-        setIsProcessing(false);
+        isProcessingRef.current = false;
       }, 2500);
     }
   };

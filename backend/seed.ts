@@ -1,27 +1,27 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
-dotenv.config();
 
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log('Limpiando base de datos...');
+  await prisma.attendance.deleteMany();
+  await prisma.student.deleteMany();
+  
+  console.log('Creando o actualizando usuario superadmin...');
   const hashedPassword = await bcrypt.hash('admin123', 10);
-
-  const user = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'admin@colegio.edu' },
-    update: {
-      password: hashedPassword
-    },
+    update: { password: hashedPassword, role: 'ADMIN', name: 'SuperAdmin' },
     create: {
-      name: 'admin',
+      name: 'SuperAdmin',
       email: 'admin@colegio.edu',
       password: hashedPassword,
       role: 'ADMIN',
     },
   });
 
-  console.log('Usuario creado:', user.name, 'Contraseña:', 'admin123');
+  console.log('Base de datos inicializada correctamente. Cuenta de superadmin lista.');
 }
 
 main()
@@ -31,5 +31,5 @@ main()
   .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
-    // error exit removed
+    process.exit(1);
   });

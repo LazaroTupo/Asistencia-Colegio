@@ -44,7 +44,8 @@ export class WhatsappController {
       const payload = {
         instanceName,
         token: instanceName, // un token simple asociado
-        qrcode: true
+        qrcode: true,
+        integration: "WHATSAPP-BAILEYS"
       };
 
       const response = await axios.post(url, payload, { headers: WhatsappController.getHeaders() });

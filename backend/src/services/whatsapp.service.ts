@@ -13,11 +13,11 @@ export class WhatsappService {
     try {
       const settings = await ConfigService.getSettings();
       const instance = settings['evolution_instance'];
-      const baseUrl = settings['evolution_base_url'];
+      const baseUrl = process.env.EVOLUTION_API_URL || 'http://localhost:8080';
       const apiKey = process.env.EVOLUTION_API_KEY;
 
-      if (!instance || !baseUrl) {
-        console.warn('WathasApp Service: No se ha configurado la instancia o la url base.');
+      if (!instance) {
+        console.warn('WathasApp Service: No se ha configurado la instancia activa.');
         return;
       }
 
