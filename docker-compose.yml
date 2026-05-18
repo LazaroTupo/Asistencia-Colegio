@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:15
+    container_name: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,6 +15,7 @@ services:
 
   redis:
     image: redis:alpine
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
@@ -50,6 +52,11 @@ services:
       - evolution_instances:/evolution/instances
       - evolution_store:/evolution/store
     restart: always
+
+networks:
+  default:
+    name: dokploy-network
+    external: true
 
 volumes:
   pgdata:
