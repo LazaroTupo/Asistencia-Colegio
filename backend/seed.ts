@@ -7,7 +7,7 @@ async function main() {
   console.log('Limpiando base de datos...');
   await prisma.attendance.deleteMany();
   await prisma.student.deleteMany();
-  
+
   console.log('Creando o actualizando usuario superadmin...');
   const hashedPassword = await bcrypt.hash('admin123', 10);
   await prisma.user.upsert({
@@ -31,5 +31,4 @@ main()
   .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
-    process.exit(1);
   });
