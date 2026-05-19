@@ -11,4 +11,21 @@ const api = axios.create({
   }
 });
 
+// Interceptor para atrapar errores de autenticación (401) en cualquier petición
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // La sesión caducó o el servidor se reinició
+      localStorage.removeItem('user');
+      
+      // Solo redirigir si no estamos ya en la página de login
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
