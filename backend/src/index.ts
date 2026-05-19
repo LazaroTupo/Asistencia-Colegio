@@ -36,14 +36,16 @@ app.use(express.json());
 
 app.set('trust proxy', 1);
 
+const isProd = process.env.NODE_ENV === 'production' || !!process.env.FRONTEND_URL;
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'super_secret_key_asistencia_123',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProd,
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: 1000 * 60 * 60 * 24 // 1 día
   }
 }));
