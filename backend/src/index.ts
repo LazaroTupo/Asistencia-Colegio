@@ -34,6 +34,8 @@ app.use(cors({
 
 app.use(express.json());
 
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'super_secret_key_asistencia_123',
   resave: false,
@@ -41,6 +43,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 1000 * 60 * 60 * 24 // 1 día
   }
 }));
