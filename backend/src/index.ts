@@ -18,6 +18,11 @@ app.use(cors({
       'http://localhost:3000',
     ];
     
+    // Agregar origin de producción si existe la variable
+    if (process.env.FRONTEND_URL) {
+      allowed.push(process.env.FRONTEND_URL);
+    }
+    
     if (allowed.includes(origin) || origin.endsWith('.loca.lt') || origin.endsWith('.devtunnels.ms')) {
       callback(null, true);
     } else {
