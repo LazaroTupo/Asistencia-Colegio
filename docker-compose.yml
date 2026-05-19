@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata2:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
 
@@ -40,6 +40,7 @@ services:
       # Database
       - DATABASE_PROVIDER=postgresql
       - DATABASE_CONNECTION_URI=${DATABASE_CONNECTION_URI}
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution_api
       # Redis Cache
       - CACHE_REDIS_ENABLED=true
       - CACHE_REDIS_URI=redis://redis:6379
@@ -59,7 +60,7 @@ networks:
     external: true
 
 volumes:
-  pgdata:
+  pgdata2:
   redisdata:
   evolution_instances:
   evolution_store:
